@@ -1,5 +1,7 @@
 # ATF Miners Bot 🚀
 
+**🔗 Register & Play ATF Miners:** [https://t.me/ATF_AIRDROP_bot](https://t.me/ATF_AIRDROP_bot?start=740497999)
+
 An automation bot for the **ATF Miners** Telegram game. Built using Python with a clean, real-time, flicker-free terminal User Interface (UI) powered by the `rich` library.
 
 ## ✨ Key Features
