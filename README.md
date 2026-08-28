@@ -48,6 +48,30 @@ Execute the following command in your terminal / command prompt:
 python bot.py
 ```
 
+### 🌍 Running 24/7 on a VPS (Using `screen`)
+
+If you want the bot to keep running after you close your SSH terminal, it is highly recommended to use `screen`.
+
+1. **Install Screen** (if not already installed):
+   ```bash
+   sudo apt-get install screen -y
+   ```
+2. **Start a New Screen Session** (named `atf-bot`):
+   ```bash
+   screen -S atf-bot
+   ```
+3. **Run the Bot** inside the screen session:
+   ```bash
+   python bot.py
+   ```
+4. **Detach from the Screen** (leave it running in the background):
+   Press `Ctrl + A`, then press `D`. You can now safely close your SSH connection.
+5. **Reattach / View the Screen later**:
+   To view the bot's live terminal again, simply type:
+   ```bash
+   screen -r atf-bot
+   ```
+
 ---
 
 ## ⚠️ Disclaimer
