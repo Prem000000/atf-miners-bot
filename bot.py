@@ -280,11 +280,16 @@ def process_boost(acc):
     if acc.get("proxy"):
         sess.proxies.update({"http": acc["proxy"], "https": acc["proxy"]})
         
-    # Login required just to get the session/token if it expired
     login_res = api(sess, "login", acc, retries=1)
-    if login_res:
-        token = login_res.get("token") or (login_res.get("data") or {}).get("token")
-        if token: sess.headers.update({"Authorization": f"Bearer {token}"})
+    if not login_res:
+        with lock:
+            acc["boost_status"] = "Login Failed"
+            acc["boost_end"] = time.time() + 5.0
+        sess.close()
+        return
+        
+    token = login_res.get("token") or (login_res.get("data") or {}).get("token")
+    if token: sess.headers.update({"Authorization": f"Bearer {token}"})
         
     parsed = dict(urllib.parse.parse_qsl(acc["query"]))
     user_str = parsed.get("user", "{}")
@@ -301,12 +306,12 @@ def process_boost(acc):
     }
     
     br = api(sess, "activate_boost", acc, extra=payload, retries=1)
-    wait_time = 8.0 # default 8 seconds
+    wait_time = 10.0
     status_msg = "Tap Success!"
     
     if br:
         if br.get("status") == "success":
-            wait_time = br.get("boost_cycle_seconds", 8.0)
+            wait_time = 10.0
             pending = br.get("pending_reward", 0)
             status_msg = f"+{pending} ATF"
             
@@ -402,26 +407,27 @@ def process_tasks(acc):
         acc["task_status"] = f"Done (+{start_count} Claimed)"
         acc["task_end"] = time.time() + 60.0
 
-def worker_thread():
+def worker_thread(acc):
+    time.sleep(random.uniform(0.5, 5.0)) # Stagger thread starts
     while True:
         now = time.time()
-        for acc in ACCOUNTS:
-            # 1. Prioritaskan Mining
-            if now >= acc["mining_end"]:
-                process_mining(acc)
-                continue # Hindari tabrakan dengan proses lain
+        
+        # 1. Prioritaskan Mining
+        if now >= acc["mining_end"]:
+            process_mining(acc)
+            continue # Kembali ke awal loop
+        
+        # 2. Prioritaskan Boost
+        if now >= acc["boost_end"]:
+            process_boost(acc)
+            continue
             
-            # 2. Prioritaskan Boost
-            if now >= acc["boost_end"]:
-                process_boost(acc)
-                continue
-                
-            # 3. Terakhir Task
-            if now >= acc["task_end"]:
-                process_tasks(acc)
-                continue
-                
-        time.sleep(0.5)
+        # 3. Terakhir Task
+        if now >= acc["task_end"]:
+            process_tasks(acc)
+            continue
+            
+        time.sleep(1.0)
 
 def main():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -469,9 +475,10 @@ def main():
     # Kosongkan layar sebelum menjalankan UI Live
     os.system("cls" if os.name == "nt" else "clear")
 
-    # Start worker
-    t = threading.Thread(target=worker_thread, daemon=True)
-    t.start()
+    # Start worker per account
+    for acc in ACCOUNTS:
+        t = threading.Thread(target=worker_thread, args=(acc,), daemon=True)
+        t.start()
 
     # Start UI
     try:
