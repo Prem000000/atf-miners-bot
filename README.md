@@ -7,6 +7,7 @@ An automation bot for the **ATF Miners** Telegram game. Built using Python with 
 - **[Multi-Account Support]** Run unlimited accounts simultaneously without issues.
 - **[Auto Mining]** Automatically claims and starts a new mining cycle every hour.
 - **[Auto Captcha Bypass]** Equipped with a built-in solver to crack the newly implemented *Math Captcha* (e.g., `11 - 3 = ?`) required before starting the mining process.
+- **[Smart Proxy Support]** Full support for HTTP and SOCKS5 proxies (`proxies.txt`). Includes an **auto-rotate feature** that automatically switches to a new, healthy proxy if a network error or connection timeout occurs.
 - **[Auto Tap / Boost]** Automatically taps the ATF coin to earn additional balance based on available energy, while strictly respecting server cooldowns and rate limits to avoid temporary bans.
 - **[Auto Tasks]** Automatically clicks "Go" on all unfinished tasks and relentlessly attempts to "Claim" them every minute. This perfectly bypasses the ATF server's hidden ~2-hour cooldown system for tasks.
 - **[Live Dashboard]** An elegant, organized, and non-flickering 3-column terminal UI to monitor **Mining**, **Auto-Tap**, and **Tasks** in real-time.
@@ -21,7 +22,7 @@ Make sure you have installed **Python 3.10** or a newer version on your operatin
 
 1. **Clone this repository** (or download the ZIP):
    ```bash
-   git clone https://github.com/USERNAME/atf-miners-bot.git
+   git clone https://github.com/imorekt/atf-miners-bot.git
    cd atf-miners-bot
    ```
 
